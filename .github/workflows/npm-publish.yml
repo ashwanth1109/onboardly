@@ -38,14 +38,7 @@ jobs:
           run_install: false
 
       - name: Install dependencies
-        run: |
-          if [ ! -f "pnpm-lock.yaml" ]; then
-            echo "Lockfile not found. Installing without frozen-lockfile..."
-            pnpm install
-          else
-            echo "Lockfile found. Installing with frozen-lockfile..."
-            pnpm install --frozen-lockfile
-          fi
+        run: pnpm install
 
       - name: Build packages
         run: pnpm run build:packages
