@@ -2,8 +2,25 @@ import './App.css'
 import { Onboardly } from 'onboardly';
 import { useState } from 'react';
 
+// Define the step interface to match what's expected by Onboardly
+interface OnboardlyStep {
+  target: string | string[];
+  title: string;
+  content: string;
+  position?: 'top' | 'bottom' | 'left' | 'right';
+  setup?: () => void | Promise<void>;
+  cleanup?: () => void;
+  styles?: {
+    tooltip?: React.CSSProperties;
+    highlight?: React.CSSProperties;
+    spotlightMask?: React.CSSProperties;
+  };
+}
+
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [isTourActive, setIsTourActive] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
   
   // Fake data for our dashboard
   const stats = [
@@ -21,17 +38,69 @@ function App() {
     { id: 5, user: 'Michael Wilson', action: 'invited team member', time: '5 hours ago' },
   ];
 
+  // Define tour steps
+  const tourSteps: OnboardlyStep[] = [
+    {
+      target: 'welcome',
+      title: 'Welcome to Onboardly Dashboard',
+      content: 'This guided tour will help you explore the main features of your dashboard. Click Next to continue.',
+      position: 'bottom'
+    },
+    {
+      target: 'nav-tabs',
+      title: 'Navigation',
+      content: 'Use these tabs to navigate between different sections of your dashboard.',
+      position: 'bottom'
+    },
+    {
+      target: 'stats-cards',
+      title: 'Stats Overview',
+      content: 'These cards show you key performance metrics at a glance.',
+      position: 'top'
+    },
+    {
+      target: 'chart-visualization',
+      title: 'Weekly User Engagement',
+      content: 'This chart shows your weekly user engagement trends.',
+      position: 'left'
+    },
+    {
+      target: 'recent-activity',
+      title: 'Recent Activity',
+      content: 'Track the latest actions from your users in real-time.',
+      position: 'right'
+    }
+  ];
+
+  const handleTourStart = () => {
+    setIsTourActive(true);
+  };
+
+  const handleTourEnd = () => {
+    setIsTourActive(false);
+    setCurrentStep(0);
+  };
+
+  const handleStepChange = (newStep: number) => {
+    setCurrentStep(newStep);
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       {/* 1. Header with navigation */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
-            <div className="flex items-center">
+            <div className="flex items-center" id="welcome">
               <div className="text-xl font-bold text-indigo-600">Onboardly Dashboard</div>
-              <Onboardly className="ml-2 text-gray-500 text-sm" />
+              <button 
+                onClick={handleTourStart}
+                className="ml-3 px-3 py-1 text-sm bg-indigo-100 text-indigo-700 rounded-md hover:bg-indigo-200"
+              >
+                Start Tour
+              </button>
             </div>
-            <nav className="flex space-x-8">
+            <nav className="flex space-x-8" id="nav-tabs">
               {['dashboard', 'analytics', 'settings', 'help'].map((tab) => (
                 <button
                   key={tab}
@@ -52,7 +121,7 @@ function App() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* 2. Stats Cards */}
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+        <div id="stats-cards" className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
           {stats.map((stat) => (
             <div key={stat.id} className="bg-white overflow-hidden shadow rounded-lg">
               <div className="px-4 py-5 sm:p-6">
@@ -71,7 +140,7 @@ function App() {
         </div>
 
         {/* 3. Chart Visualization (mocked with colored bars) */}
-        <div className="bg-white p-6 shadow rounded-lg mb-8">
+        <div id="chart-visualization" className="bg-white p-6 shadow rounded-lg mb-8">
           <h2 className="text-lg font-medium text-gray-900 mb-4">Weekly User Engagement</h2>
           <div className="h-64 flex items-end space-x-2">
             {[40, 65, 50, 80, 75, 90, 60].map((height, index) => (
@@ -89,7 +158,7 @@ function App() {
         </div>
 
         {/* 4. Recent Activity Feed */}
-        <div className="bg-white shadow rounded-lg mb-8">
+        <div id="recent-activity" className="bg-white shadow rounded-lg mb-8">
           <div className="px-4 py-5 sm:px-6">
             <h2 className="text-lg font-medium text-gray-900">Recent Activity</h2>
             <p className="mt-1 text-sm text-gray-500">Latest actions from your users</p>
@@ -140,6 +209,29 @@ function App() {
           </div>
         </footer>
       </main>
+
+      {/* Onboardly Tour Component */}
+      <Onboardly
+        steps={tourSteps}
+        isActive={isTourActive}
+        currentStep={currentStep}
+        onStepChange={handleStepChange}
+        onStart={() => console.log('Tour started')}
+        onEnd={handleTourEnd}
+        options={{
+          spotlightPadding: 8,
+          highlightPulsate: true,
+          showProgressDots: true,
+          exitOnEscape: true,
+          maskOpacity: 0.7
+        }}
+        labels={{
+          nextButton: 'Next',
+          backButton: 'Back',
+          skipButton: 'Skip Tour',
+          finishButton: 'Finish'
+        }}
+      />
     </div>
   )
 }
