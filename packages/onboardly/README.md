@@ -25,3 +25,21 @@ function App() {
 ## Development
 
 For monorepo development instructions, see the root README.md file. 
+
+## Publishing
+
+To publish a new version of the package to npm:
+
+1. Update the version in `package.json`
+2. Build the package:
+   ```bash
+   pnpm build
+   ```
+3. Log in to npm (if not already logged in):
+   ```bash
+   npm login
+   ```
+4. Publish the package:
+   ```bash
+   npm publish
+   ``` 
