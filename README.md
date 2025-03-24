@@ -5,6 +5,10 @@
 
 NPM library package for Guided Walkthroughs for User Onboarding
 
+## How to use?
+
+[Usage README](./packages/onboardly/README.md)
+
 ## Development Setup
 
 ### Building the Package
