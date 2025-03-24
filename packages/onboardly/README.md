@@ -22,10 +22,6 @@ function App() {
 }
 ```
 
-## Development
-
-For monorepo development instructions, see the root README.md file. 
-
 ## Publishing
 
 To publish a new version of the package to npm:
