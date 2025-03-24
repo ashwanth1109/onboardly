@@ -76,6 +76,9 @@ jobs:
           git add package.json
           git commit -m "Release $NEW_VERSION - ${{ github.event.inputs.changelog }}"
           
+          # Push the commit
+          git push origin HEAD
+          
           # Set environment variable for later steps
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
