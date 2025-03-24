@@ -37,6 +37,11 @@ jobs:
           version: 8
           run_install: false
 
+      - name: Configure Git
+        run: |
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+
       - name: Install dependencies
         run: pnpm install
 
@@ -46,8 +51,33 @@ jobs:
       - name: Update version
         working-directory: ./packages/onboardly
         run: |
-          npm version ${{ github.event.inputs.version_type }} -m "Release %s - ${{ github.event.inputs.changelog }}"
-          echo "NEW_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
+          # Get current version
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          
+          # Calculate new version based on version_type
+          if [ "${{ github.event.inputs.version_type }}" == "patch" ]; then
+            IFS='.' read -ra VERSION_PARTS <<< "$CURRENT_VERSION"
+            PATCH=$((VERSION_PARTS[2] + 1))
+            NEW_VERSION="${VERSION_PARTS[0]}.${VERSION_PARTS[1]}.$PATCH"
+          elif [ "${{ github.event.inputs.version_type }}" == "minor" ]; then
+            IFS='.' read -ra VERSION_PARTS <<< "$CURRENT_VERSION"
+            MINOR=$((VERSION_PARTS[1] + 1))
+            NEW_VERSION="${VERSION_PARTS[0]}.$MINOR.0"
+          elif [ "${{ github.event.inputs.version_type }}" == "major" ]; then
+            IFS='.' read -ra VERSION_PARTS <<< "$CURRENT_VERSION"
+            MAJOR=$((VERSION_PARTS[0] + 1))
+            NEW_VERSION="$MAJOR.0.0"
+          fi
+          
+          # Update package.json
+          sed -i "s/\"version\": \"$CURRENT_VERSION\"/\"version\": \"$NEW_VERSION\"/" package.json
+          
+          # Commit the change
+          git add package.json
+          git commit -m "Release $NEW_VERSION - ${{ github.event.inputs.changelog }}"
+          
+          # Set environment variable for later steps
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
       - name: Publish to NPM
         working-directory: ./packages/onboardly
@@ -57,8 +87,6 @@ jobs:
 
       - name: Create Git tag
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
           git tag -a v${{ env.NEW_VERSION }} -m "Release v${{ env.NEW_VERSION }} - ${{ github.event.inputs.changelog }}"
           git push origin v${{ env.NEW_VERSION }}
 
