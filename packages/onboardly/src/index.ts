@@ -1,2 +1,2 @@
 export { Onboardly } from './Onboardly';
-export type { OnboardlyProps } from './Onboardly'; 
+export type { OnboardlyProps, OnboardlyStep } from './Onboardly'; 
