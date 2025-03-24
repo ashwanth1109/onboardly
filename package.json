@@ -3,14 +3,19 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:packages": "pnpm -r --filter ./packages/* build"
   },
   "dependencies": {
     "@tailwindcss/vite": "4.0.15",
+    "onboardly": "workspace:*",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
