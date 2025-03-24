@@ -12,7 +12,8 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "prepublishOnly": "npm run build"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",
@@ -22,5 +23,21 @@
     "@types/react": "^19.0.10",
     "tsup": "^8.0.2",
     "typescript": "~5.7.2"
-  }
-} 
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "react",
+    "onboarding",
+    "component",
+    "ui",
+    "walkthrough",
+    "guided",
+    "step-by-step",
+    "tutorial",
+    "introduction",
+    "welcome screen"
+  ],
+  "license": "MIT"
+}
